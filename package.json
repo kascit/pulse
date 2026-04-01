@@ -1,18 +1,11 @@
 {
   "name": "pulse",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently \"pnpm --filter server dev\" \"pnpm --filter client dev\"",
-    "install-all": "pnpm --filter server install & pnpm --filter client install"
+    "install-all": "pnpm --filter server install && pnpm --filter client install"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.32.1",
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^8.0.0"
   }
 }
