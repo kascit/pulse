@@ -1,108 +1,73 @@
 # Pulse
 
-API uptime and latency monitor. Register HTTP endpoints, ping them on a schedule, view uptime and latency trends on a dashboard.
+An open-source uptime and cron monitoring platform. Pulse allows you to track HTTP endpoints, monitor background jobs, route alerts, and publish public status pages — all from a single dashboard.
 
-## Stack
+## Tech Stack
 
-**Frontend** — React (Vite), Tailwind CSS, shadcn/ui, TanStack Query, Recharts, react-router-dom  
-**Backend** — Node.js, Express, Mongoose, Zod, node-cron, axios  
-**Database** — MongoDB Atlas (M0 free tier)  
-**Deploy** — Vercel (frontend), Render (backend)
+**Workspace** — pnpm workspaces, concurrently  
+**Frontend** — React 19, Vite, Tailwind CSS v4, shadcn/ui (Radix UI), TanStack Query, Zustand, React Router v7, React Hook Form + Zod, Recharts, Sonner, Lucide & Hugeicons  
+**Backend** — Node.js, Express v5, Mongoose (MongoDB), Zod, node-cron, jose (JWT), bcryptjs, helmet  
+**Database** — MongoDB Atlas  
+**Deploy** — Vercel (Frontend), Render (Backend API & CRON)
 
 ## Features
 
-- Add, edit, delete monitored endpoints
-- Configurable check interval per monitor (1 / 5 / 15 / 60 min)
-- Pause and resume monitors without losing history
-- Latency time-series chart and uptime percentage per monitor
-- Ping logs auto-expire after 7 days (MongoDB TTL index)
-- Request validation via Zod
+- **Authentication:** Secure JWT-based login and registration.
+- **Monitors (Active):** Ping HTTP endpoints on configurable schedules (1, 5, 15, 30, 60 mins). Tracks uptime and latency.
+- **Heartbeats (Passive):** Monitor background jobs, backups, and cron tasks. Generates unique ping URLs with configurable grace periods.
+- **Alerting & Routing:** Create alert rules based on resource status changes. Route notifications to Webhooks or Telegram.
+- **Public Status Pages:** Create shareable, public-facing status pages. Attach specific monitors/heartbeats, customize slugs, and manually pause updates during maintenance.
+- **Activity Logs:** Comprehensive audit log of all system events, resource creations, status changes, and alert dispatches.
 
 ## Project Structure
 
-```
+```text
 pulse/
-├── client/          # React + Vite
+├── client/          # React + Vite Frontend
 │   └── src/
-│       ├── components/
-│       ├── pages/
-│       ├── hooks/
-│       └── lib/
-└── server/          # Express API
-    ├── models/
-    ├── routes/
-    ├── controllers/
-    ├── services/
-    └── jobs/
+│       ├── components/  # Reusable UI & Layout
+│       ├── hooks/       # Custom React Query mutations
+│       ├── lib/         # API client, event configs
+│       ├── pages/       # Route components
+│       ├── store/       # Zustand auth store
+│       └── types/       # TypeScript interfaces
+└── server/          # Express API Backend
+    ├── controllers/ # Route handlers
+    ├── jobs/        # CRON scheduler & stats aggregation
+    ├── middleware/  # JWT Auth & Error handling
+    ├── models/      # Mongoose schemas
+    ├── routes/      # Express routers
+    ├── services/    # Uptime checkers & alert dispatchers
+    └── validation/  # Zod schemas
 ```
-
-## Database Schema
-
-**monitors**
-
-| Field | Type | Notes |
-|-------|------|-------|
-| name | String | required |
-| url | String | required |
-| method | String | GET \| POST, default GET |
-| intervalMinutes | Number | default 5 |
-| isActive | Boolean | default true |
-| createdAt / updatedAt | Date | auto |
-
-**pings**
-
-| Field | Type | Notes |
-|-------|------|-------|
-| monitorId | ObjectId | ref Monitor, indexed |
-| statusCode | Number | 0 on timeout |
-| latencyMs | Number | |
-| isUp | Boolean | true if 2xx |
-| timestamp | Date | TTL 7 days |
-
-## API
-
-| Method | Route | Description |
-|--------|-------|-------------|
-| POST | /api/monitors | Create monitor |
-| GET | /api/monitors | List all monitors |
-| PUT | /api/monitors/:id | Edit or pause/resume |
-| DELETE | /api/monitors/:id | Delete monitor and pings |
-| GET | /api/monitors/:id/stats | Uptime %, avg latency, recent pings |
 
 ## Local Setup
 
-**Prerequisites:** Node >= 18, MongoDB Atlas M0 cluster
+**Prerequisites:** Node >= 18, pnpm, MongoDB
 
 ```bash
-git clone https://github.com/<you>/pulse.git
+git clone https://github.com/kascit/pulse.git
 cd pulse
 
-# backend
-cd server && npm install
-cp .env.example .env   # add MONGO_URI and PORT
-npm run dev
+# Install dependencies (root + both workspaces)
+pnpm install
 
-# frontend (new terminal)
-cd client && npm install
-cp .env.example .env   # set VITE_API_URL=http://localhost:5000/api
-npm run dev
+# Setup environment variables
+cp server/.env.example server/.env
+cp client/.env.example client/.env
+
+# Start both server and client concurrently
+pnpm run dev
 ```
+
+- Backend API: `http://localhost:5000`
+- Frontend UI: `http://localhost:5173`
 
 ## Deployment
 
-1. **MongoDB Atlas** — create M0 cluster, whitelist `0.0.0.0/0`
-2. **Render** — new Web Service from `server/`, set `MONGO_URI` env var
-3. **Vercel** — import `client/`, set `VITE_API_URL` to Render URL
-
-Both auto-deploy on push to `main`.
-
-Note: Render free tier cold-starts after 15 min of inactivity. First ping after wake may be delayed ~50s.
-
-## Roadmap
-
-- [ ] Alerting (email / webhook on status change)
-- [ ] Auth and multi-tenant workspaces
-- [ ] Public status page
+1. **MongoDB Atlas**: Deploy an M0 cluster.
+2. **Render (Backend)**: Deploy the `server/` directory as a Web Service. Set `MONGO_URI`, `JWT_SECRET`, and `CLIENT_URL`.
+3. **Vercel (Frontend)**: Deploy the `client/` directory. Set `VITE_API_URL` to your Render backend URL.
 
 ## License
 
