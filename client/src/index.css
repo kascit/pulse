@@ -121,11 +121,44 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   html {
     @apply font-sans;
-    }
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+  }
+  /* All interactive elements get pointer cursor globally */
+  button, [role="button"], a, label[for], select {
+    cursor: pointer;
+  }
+  ::selection {
+    background-color: color-mix(in oklch, var(--primary) 20%, transparent);
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(from var(--border) l c h / 0.8);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(from var(--muted-foreground) l c h / 0.5);
+  }
+  /* Smoother card transitions */
+  .card {
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  /* Tighter heading letter-spacing */
+  h1, h2, h3 {
+    letter-spacing: -0.025em;
+  }
 }
