@@ -7,7 +7,7 @@ import { Layout } from "@/components/Layout"
 import { logsAPI } from "@/lib/api"
 import type { Log } from "@/types"
 import { format } from "date-fns"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, FileText } from "lucide-react"
 import { ResourceLink } from "@/components/ResourceLink"
 import { EVENT_CONFIG, DEFAULT_EVENT } from "@/lib/events"
 

@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -12,8 +12,7 @@ import { FormField } from "@/components/forms/FormField"
 import { authAPI } from "@/lib/api"
 import { useAuthStore } from "@/store/auth"
 import { toast } from "sonner"
-import { Eye, EyeOff, CheckCircle, XCircle, Trash2 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Eye, EyeOff, Trash2 } from "lucide-react"
 
 const simplePassword = z.string().min(6, "At least 6 characters")
 
@@ -31,9 +30,10 @@ const passwordSchema = z.object({
   path: ["confirmPassword"],
 })
 
+type PasswordFields = { currentPassword: string; newPassword: string; confirmPassword: string }
+
 export default function Settings() {
   const { user, updateUser, clearAuth } = useAuthStore()
-  const navigate = useNavigate()
   const [showCurrent, setShowCurrent] = useState(false)
   const [showNew, setShowNew] = useState(false)
   const [deletePassword, setDeletePassword] = useState("")
@@ -55,8 +55,7 @@ export default function Settings() {
   })
 
   // ── Password form ─────────────────────────────────────────────────────────
-  const passForm = useForm({ resolver: zodResolver(passwordSchema) })
-  const newPassword = passForm.watch("newPassword") ?? ""
+  const passForm = useForm<PasswordFields>({ resolver: zodResolver(passwordSchema) })
 
   const passMutation = useMutation({
     mutationFn: (data: { currentPassword: string; newPassword: string }) => authAPI.updateMe(data),
@@ -88,10 +87,10 @@ export default function Settings() {
           <CardContent>
             <form onSubmit={profileForm.handleSubmit((d) => profileMutation.mutate(d))} className="space-y-4">
               <FormField label="Name" error={profileForm.formState.errors.name?.message}>
-                <Input id="settings-name" name="settings-name" autoComplete="name" {...profileForm.register("name")} />
+                <Input id="settings-name" autoComplete="name" {...profileForm.register("name")} />
               </FormField>
               <FormField label="Email" error={profileForm.formState.errors.email?.message}>
-                <Input id="settings-email" name="settings-email" type="email" autoComplete="email" {...profileForm.register("email")} />
+                <Input id="settings-email" type="email" autoComplete="email" {...profileForm.register("email")} />
               </FormField>
               <Button type="submit" disabled={profileMutation.isPending}>
                 {profileMutation.isPending ? "Saving…" : "Save changes"}
@@ -109,12 +108,11 @@ export default function Settings() {
             <CardDescription>Choose a new password with at least 6 characters</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={passForm.handleSubmit((d) => passMutation.mutate(d))} className="space-y-4">
-              <FormField label="Current password" error={passForm.formState.errors.currentPassword?.message}>
+            <form onSubmit={passForm.handleSubmit((d) => passMutation.mutate(d as PasswordFields))} className="space-y-4">
+              <FormField label="Current password" error={passForm.formState.errors.currentPassword?.message as string | undefined}>
                 <div className="relative">
                   <Input
                     id="current-password"
-                    name="current-password"
                     type={showCurrent ? "text" : "password"}
                     autoComplete="current-password"
                     className="pr-10"
@@ -127,11 +125,10 @@ export default function Settings() {
                 </div>
               </FormField>
 
-              <FormField label="New password" error={passForm.formState.errors.newPassword?.message}>
+              <FormField label="New password" error={passForm.formState.errors.newPassword?.message as string | undefined}>
                 <div className="relative">
                   <Input
                     id="new-password"
-                    name="new-password"
                     type={showNew ? "text" : "password"}
                     autoComplete="new-password"
                     className="pr-10"
@@ -144,10 +141,9 @@ export default function Settings() {
                 </div>
               </FormField>
 
-              <FormField label="Confirm new password" error={passForm.formState.errors.confirmPassword?.message}>
+              <FormField label="Confirm new password" error={passForm.formState.errors.confirmPassword?.message as string | undefined}>
                 <Input
                   id="confirm-password"
-                  name="confirm-password"
                   type="password"
                   autoComplete="new-password"
                   {...passForm.register("confirmPassword")}

@@ -13,13 +13,12 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card"
-import { Eye, EyeOff, CheckCircle, XCircle, ArrowLeft } from "lucide-react"
+import { Eye, EyeOff } from "lucide-react"
 import { authAPI } from "@/lib/api"
 import { useAuthStore } from "@/store/auth"
 import { toast } from "sonner"
 import { Layout } from "@/components/Layout"
 import { FormField } from "@/components/forms/FormField"
-import { cn } from "@/lib/utils"
 
 const simplePassword = z.string().min(6, "At least 6 characters")
 
@@ -45,13 +44,11 @@ export default function AuthPage() {
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
     reset,
   } = useForm({
     resolver: zodResolver(isRegister ? registerSchema : loginSchema),
   })
-  const password = watch("password") ?? ""
 
   // Step 1: send OTP (register) or log in directly
   const authMutation = useMutation({

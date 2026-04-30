@@ -27,7 +27,7 @@ const schema = z.object({
   intervalMinutes: z
     .number()
     .int()
-    .refine((v) => INTERVAL_OPTIONS.includes(v), {
+    .refine((v) => (INTERVAL_OPTIONS as readonly number[]).includes(v), {
       message: "Interval must be 1, 5, 15, 30, or 60",
     }),
   expectedKeyword: z.string().optional(),
@@ -149,7 +149,7 @@ export function MonitorForm({ open, onOpenChange, item }: Props) {
         <FormField label={`Interval: ${watch("intervalMinutes")}m`}>
           <Select
             value={String(watch("intervalMinutes"))}
-            onValueChange={(v) => setValue("intervalMinutes", Number(v))}
+            onValueChange={(v) => setValue("intervalMinutes", Number(v) as FormData["intervalMinutes"])}
           >
             <SelectTrigger>
               <SelectValue />

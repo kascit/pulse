@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+
 import { Layout } from "@/components/Layout"
 import { StatusPageForm } from "@/components/forms/StatusPageForm"
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog"
@@ -14,7 +14,7 @@ import { Globe, ExternalLink, Copy, Check } from "lucide-react"
 import { ResourceLink } from "@/components/ResourceLink"
 import { toast } from "sonner"
 
-const STATUS_COLOR: Record<string, string> = { up: "bg-green-500", down: "bg-red-500", degraded: "bg-yellow-500", unknown: "bg-gray-400" }
+
 
 export default function StatusPageDetail() {
   const { id } = useParams<{ id: string }>()
